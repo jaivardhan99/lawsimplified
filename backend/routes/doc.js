@@ -18,7 +18,32 @@ router.get('/docs', async (req, res) => {
   }
 })
 
-// Generate document
+// Generate PDF from HTML
+import { htmlToPdf } from '../services/pdfService.js'
+
+router.post('/generate-pdf', async (req, res) => {
+  try {
+    const { html } = req.body;
+    if (!html) {
+      return res.status(400).json({ error: 'HTML content is required' });
+    }
+
+    const pdfBuffer = await htmlToPdf(html);
+    console.log(`Generated PDF size: ${pdfBuffer.length} bytes`);
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Length': pdfBuffer.length,
+    });
+
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('PDF Generation Error:', error);
+    res.status(500).json({ error: 'Failed to generate PDF' });
+  }
+});
+
+// Generate document (AI)
 router.post('/generateDoc', async (req, res) => {
   try {
     const { docType, conversation, userId } = req.body

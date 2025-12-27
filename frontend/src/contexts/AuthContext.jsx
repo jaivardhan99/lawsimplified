@@ -108,6 +108,10 @@ export const AuthProvider = ({ children }) => {
       // Provide more specific error messages
       if (error.code === 'auth/configuration-not-found') {
         throw new Error('Email/Password Authentication is not enabled for this Firebase project. Please enable it in the Firebase Console.')
+      } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+        throw new Error('Account not found. Please register before signing in.')
+      } else if (error.code === 'auth/wrong-password') {
+        throw new Error('Incorrect password. Please try again or reset it.')
       }
       throw error
     }

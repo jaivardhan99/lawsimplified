@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Check, X } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import axios from 'axios'
+import apiClient from '../utils/apiClient'
 
 const Pricing = () => {
   const { user } = useAuth()
@@ -93,7 +93,7 @@ const Pricing = () => {
         return
       }
 
-      const response = await axios.post('/api/payment', {
+      const response = await apiClient.post('/api/payment', {
         amount,
         userId: user.uid,
         plan: plan === 'pro' ? 'subscription' : 'one-time'
@@ -111,7 +111,7 @@ const Pricing = () => {
           description: `${plan === 'pro' ? 'Pro Subscription' : 'Document Generation'}`,
           order_id: response.data.orderId,
           handler: async (response) => {
-            const verifyResponse = await axios.post('/api/payment/verify', {
+            const verifyResponse = await apiClient.post('/api/payment/verify', {
               orderId: response.razorpay_order_id,
               paymentId: response.razorpay_payment_id,
               signature: response.razorpay_signature,

@@ -1,6 +1,9 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+// Load env vars BEFORE importing other files that might use them
+dotenv.config()
+
 import mongoose from 'mongoose'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
@@ -10,8 +13,6 @@ import paymentRoutes from './routes/payment.js'
 import lawyerRoutes from './routes/lawyer.js'
 import contactRoutes from './routes/contact.js'
 
-dotenv.config()
-
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
@@ -20,6 +21,10 @@ const app = express()
 const PORT = process.env.PORT || 5000
 
 // Middleware
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  next();
+});
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))

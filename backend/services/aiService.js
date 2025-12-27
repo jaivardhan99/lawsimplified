@@ -1,22 +1,28 @@
+
 import OpenAI from 'openai'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { promises as fs } from 'fs'
+import { join } from 'path'
 
-// Initialize Gemini AI client
-const genAI = process.env.GEMINI_API_KEY 
-  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-  : null
+// Lazy initialization to ensure env vars are loaded
+let genAI = null;
 
 // Always use Gemini since we're switching to it exclusively
 const USE_GEMINI = true
 
 export async function chatWithAI(message, conversation, docType) {
   try {
+    // Initialize on first use
+    if (!genAI && process.env.GEMINI_API_KEY) {
+      genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    }
+
     // Check if Gemini AI service is configured
     if (!genAI) {
       return {
-        text: 'I apologize, but the AI service is not configured. Please set up the Gemini API key in the environment variables. For now, I can help you understand that you need a ' + (docType || 'legal document') + '. Would you like me to guide you through the process?',
-        suggestGenerate: false,
-        preview: null
+        isError: true,
+        rawText: 'The AI service is not configured. Please set up the Gemini API key.',
+        recommendation: 'AI service not configured.'
       }
     }
 
@@ -24,58 +30,115 @@ export async function chatWithAI(message, conversation, docType) {
     return await chatWithGemini(message, conversation, docType)
   } catch (error) {
     console.error('AI service error:', error)
-    // Return a fallback response instead of throwing
     return {
-      text: 'I apologize, but I encountered an error. Please try again or contact support if the issue persists.',
-      suggestGenerate: false,
-      preview: null
+      isError: true,
+      rawText: 'I apologize, but I encountered an error. Please try again or contact support if the issue persists.',
+      recommendation: 'I apologize, but I encountered an error.'
     }
   }
 }
 
 async function chatWithGemini(message, conversation, docType) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-pro' })
+  const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-  const systemPrompt = `You are a helpful AI legal advisor for LexEase, an Indian legal documentation platform. 
-Your role is to:
-1. Understand user's legal document needs
-2. Ask clarifying questions to gather necessary information
-3. Suggest appropriate legal documents
-4. Guide users through the document creation process
-5. Be professional, clear, and helpful
-6. Focus on Indian legal requirements
+  // Read system prompt from file
+  let systemPrompt = ''
+  try {
+    const promptPath = join(process.cwd(), 'chatbotinfo.txt')
+    systemPrompt = await fs.readFile(promptPath, 'utf-8')
+  } catch (err) {
+    console.error('Failed to read chatbotinfo.txt:', err)
+    // Fallback minimal prompt
+    systemPrompt = 'You are LexEase, a legal assistant. Please answer user queries about legal documents.'
+  }
 
-${docType ? `The user is interested in creating a ${docType} document.` : ''}
-
-When the user has provided enough information, suggest generating the document.`
+  // Append context
+  systemPrompt += `\n\n${docType ? `The user is interested in creating a ${docType} document.` : ''} `
 
   const conversationText = conversation
-    .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
-    .join('\n')
+    .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content} `)
+    .join('\n');
 
-  const prompt = `${systemPrompt}\n\nConversation history:\n${conversationText}\n\nUser: ${message}\n\nAssistant:`
+  const prompt = `${systemPrompt} \n\nConversation history: \n${conversationText} \n\nUser: ${message} \n\nAssistant: `;
 
-  const result = await model.generateContent(prompt)
-  const aiResponse = result.response.text()
+  const result = await model.generateContent(prompt);
 
-  const suggestGenerate = aiResponse.toLowerCase().includes('generate') || 
-                          aiResponse.toLowerCase().includes('ready to create') ||
-                          conversation.length > 5
-
-  return {
-    text: aiResponse,
-    suggestGenerate,
-    preview: suggestGenerate ? generatePreview(docType || 'Document') : null
+  if (!result.response || !result.response.text) {
+    console.error("AI response was blocked or empty.", JSON.stringify(result, null, 2));
+    return {
+      isError: true,
+      rawText: "I'm sorry, I couldn't generate a response. This might be due to a content policy.",
+      recommendation: "I'm sorry, I couldn't generate a response."
+    };
   }
+
+  const aiResponse = result.response.text();
+  return parseLexEaseResponse(aiResponse);
 }
 
-function generatePreview(docType) {
-  return `Document Preview for ${docType}:
+function parseLexEaseResponse(text) {
+  const lines = text.split('\n').filter(line => line.trim() !== '');
 
-This is a preview of your generated document. The full document will include all the details you've provided during our conversation.
+  let recommendation = '';
+  let explanation = '';
+  let questions = [];
+  let disclaimer = '';
+  let isComplete = false;
+  let isError = false;
+  let documentType = null;
 
-To download the complete document in PDF or Word format, please complete the payment process.
 
-[Document content will be generated based on your inputs]`
+  if (text.includes("This may require legal advice.")) {
+    return {
+      isError: true,
+      rawText: text,
+      recommendation: "This may require legal advice. I can connect you with a lawyer."
+    }
+  }
+
+  // Simple parsing based on keywords
+  try {
+    recommendation = lines[0] || '';
+    const docMatch = recommendation.match(/You may need a (.+)\./);
+    if (docMatch && docMatch[1]) {
+      documentType = docMatch[1].replace(/an? /, '');
+    }
+
+    explanation = lines[1] || '';
+
+    const questionStartIndex = lines.findIndex(line => line.startsWith('-'));
+    const disclaimerStartIndex = lines.findIndex(line => line.startsWith('This is general guidance'));
+
+    if (questionStartIndex !== -1) {
+      const endSlice = disclaimerStartIndex !== -1 ? disclaimerStartIndex : lines.length;
+      questions = lines.slice(questionStartIndex, endSlice).map(q => q.substring(1).trim());
+    }
+
+    if (disclaimerStartIndex !== -1) {
+      disclaimer = lines[disclaimerStartIndex];
+    } else {
+      disclaimer = "This is general guidance, not legal advice."; // Fallback
+    }
+
+    if (lines.some(l => l.toLowerCase().includes("shall we prepare it?"))) {
+      isComplete = true;
+    }
+
+  } catch (e) {
+    // If parsing fails, return the raw text
+    return { rawText: text };
+  }
+
+
+  return {
+    recommendation,
+    explanation,
+    questions,
+    disclaimer,
+    documentType,
+    isComplete,
+    isError,
+    rawText: text, // for debugging
+  };
 }
 

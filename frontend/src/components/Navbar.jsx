@@ -6,11 +6,8 @@ import { useState } from 'react'
 const NAV_LINKS = [
   { label: 'Home', path: '/' },
   { label: 'Docs Library', path: '/docs' },
-  { label: 'Document Generator', path: '/document-generator', requiresAuth: true },
   { label: 'Insights', path: '/insights' },
   { label: 'Lawyer Connect', path: '/lawyer-connect', requiresAuth: true },
-  { label: 'Pricing', path: '/pricing' },
-  { label: 'About', path: '/about' },
   { label: 'Contact', path: '/contact' },
 ]
 

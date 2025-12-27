@@ -13,14 +13,14 @@ router.post('/', async (req, res) => {
 
     const response = await chatWithAI(message, conversation || [], docType)
 
-    res.json({
-      response: response.text,
-      suggestGenerate: response.suggestGenerate || false,
-      preview: response.preview || null
-    })
+    res.json(response)
   } catch (error) {
     console.error('Chat error:', error)
-    res.status(500).json({ error: 'Failed to process chat message' })
+    res.status(500).json({ 
+      isError: true,
+      rawText: 'Failed to process chat message',
+      recommendation: 'I am sorry, but I encountered an error. Please try again later.'
+    })
   }
 })
 

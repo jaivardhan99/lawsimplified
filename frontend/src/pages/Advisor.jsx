@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { Send, Download, FileText, HelpCircle, Bot } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import axios from 'axios'
+import apiClient from '../utils/apiClient'
 
 const Advisor = () => {
   const [searchParams] = useSearchParams()
@@ -45,7 +45,7 @@ const Advisor = () => {
     setLoading(true)
 
     try {
-      const response = await axios.post('/api/chat', {
+      const response = await apiClient.post('/api/chat', {
         message: input,
         conversation: messages,
         docType: docType || null
@@ -81,7 +81,7 @@ const Advisor = () => {
     }
 
     try {
-      const response = await axios.post('/api/generateDoc', {
+      const response = await apiClient.post('/api/generateDoc', {
         docType: docType || 'Custom Document',
         conversation: messages,
         userId: user.uid
@@ -109,7 +109,7 @@ const Advisor = () => {
   const handlePayment = async () => {
     // Razorpay payment integration
     try {
-      const response = await axios.post('/api/payment', {
+      const response = await apiClient.post('/api/payment', {
         amount: 29900, // ₹299 in paise
         userId: user.uid,
         docType: docType || 'Document'
@@ -128,7 +128,7 @@ const Advisor = () => {
           order_id: response.data.orderId,
           handler: async (response) => {
             // Verify payment
-            const verifyResponse = await axios.post('/api/payment/verify', {
+            const verifyResponse = await apiClient.post('/api/payment/verify', {
               orderId: response.razorpay_order_id,
               paymentId: response.razorpay_payment_id,
               signature: response.razorpay_signature

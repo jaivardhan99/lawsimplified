@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Send, Upload, User, Mail, Phone, FileText } from 'lucide-react'
-import axios from 'axios'
+import apiClient from '../utils/apiClient'
 
 const LawyerConnect = () => {
   const { user } = useAuth()
@@ -44,7 +44,7 @@ const LawyerConnect = () => {
         }
       })
 
-      await axios.post('/api/lawyerLead', formDataToSend, {
+      await apiClient.post('/api/lawyerLead', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

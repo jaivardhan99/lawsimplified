@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bot, X, Send } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios';
+import apiClient from '../utils/apiClient';
 
 const FloatingAIButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,20 +11,32 @@ const FloatingAIButton = () => {
   const messagesEndRef = useRef(null);
   const { user } = useAuth();
 
+  const getInitialMessage = async () => {
+    setLoading(true);
+    try {
+      const res = await apiClient.post('/api/chat', { message: 'Hi', conversation: [] });
+      const assistantMessage = {
+        role: 'assistant',
+        content: res.data.rawText,
+      };
+      setMessages([assistantMessage]);
+    } catch (error) {
+      const errorMessage = {
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.',
+      };
+      setMessages([errorMessage]);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      // Add welcome message when chat opens
-      setMessages([
-        {
-          role: 'assistant',
-          content: 'Hello! I\'m your legal assistant. How can I help you today?'
-        }
-      ]);
+      getInitialMessage();
     }
   }, [isOpen]);
 
   useEffect(() => {
-    // Scroll to bottom of messages
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
@@ -32,38 +44,31 @@ const FloatingAIButton = () => {
     if (!input.trim() || loading) return;
 
     const userMessage = { role: 'user', content: input };
-    setMessages(prev => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput('');
     setLoading(true);
 
     try {
-      // In a real implementation, you would call your backend API
-      // For now, we'll simulate a response
-      setTimeout(() => {
-        const responses = [
-          "I understand your concern. For legal documents, I recommend checking our document library.",
-          "That's an interesting question. Would you like me to help you generate a specific document?",
-          "I can help you with that. Have you considered looking at our templates for this type of document?",
-          "Great question! Our platform specializes in helping with exactly this kind of legal need."
-        ];
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-        
-        const assistantMessage = {
-          role: 'assistant',
-          content: randomResponse
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-        setLoading(false);
-      }, 1000);
+      const res = await apiClient.post('/api/chat', {
+        message: input,
+        conversation: messages,
+      });
+
+      const assistantMessage = {
+        role: 'assistant',
+        content: res.data.rawText, // Using rawText for now
+      };
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage = {
         role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again.'
+        content: 'Sorry, I encountered an error. Please try again.',
       };
       setMessages(prev => [...prev, errorMessage]);
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const toggleChat = () => {

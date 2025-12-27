@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
-import axios from 'axios';
+import apiClient from '../utils/apiClient';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -26,7 +26,7 @@ const Contact = () => {
 
     try {
       // In a real application, you would send this to your backend
-      await axios.post('/api/contact', formData);
+      await apiClient.post('/api/contact', formData);
       
       setSubmitted(true);
       setFormData({

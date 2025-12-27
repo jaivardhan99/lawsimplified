@@ -17,6 +17,12 @@ let rawConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 }
 
+console.log('--- Firebase Config Debug ---');
+Object.keys(rawConfig).forEach(k => {
+  const v = rawConfig[k];
+  console.log(`${k}: ${v ? (v.length > 5 ? v.substring(0, 5) + '...' : 'PRESENT') : 'MISSING/UNDEFINED'}`);
+});
+
 // Sanitize all string values
 const firebaseConfig = Object.fromEntries(
   Object.entries(rawConfig).map(([k, v]) => [k, sanitize(v)])
