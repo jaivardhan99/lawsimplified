@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 // Load env vars BEFORE importing other files that might use them
-dotenv.config()
+dotenv.config({ override: true })
 
 import mongoose from 'mongoose'
 import { fileURLToPath } from 'url'
