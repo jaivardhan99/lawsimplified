@@ -119,12 +119,12 @@ const FloatingAIButton = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
+    <div className="fixed z-50 pointer-events-none" style={{ bottom: '24px', right: '24px' }}>
       {/* Chat Window */}
       <div
         className={`transition-all duration-400 origin-bottom-right ${isOpen
-            ? 'opacity-100 scale-100 pointer-events-auto'
-            : 'opacity-0 scale-90 pointer-events-none'
+          ? 'opacity-100 scale-100 pointer-events-auto visible'
+          : 'opacity-0 scale-90 pointer-events-none invisible'
           }`}
         style={{
           transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
@@ -170,8 +170,8 @@ const FloatingAIButton = () => {
                 )}
                 <div
                   className={`max-w-[82%] rounded-2xl p-3.5 text-sm leading-relaxed ${msg.role === 'user'
-                      ? 'bg-gradient-to-br from-primary-600 to-primary-700 text-white rounded-br-md shadow-md shadow-primary-500/20'
-                      : 'bg-white text-gray-700 rounded-bl-md shadow-sm border border-gray-100'
+                    ? 'bg-gradient-to-br from-primary-600 to-primary-700 text-white rounded-br-md shadow-md shadow-primary-500/20'
+                    : 'bg-white text-gray-700 rounded-bl-md shadow-sm border border-gray-100'
                     }`}
                 >
                   {msg.role === 'assistant' ? (
@@ -243,7 +243,7 @@ const FloatingAIButton = () => {
       {/* Floating Button */}
       <button
         onClick={toggleChat}
-        className={`group relative bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-deep-blue p-4 rounded-2xl shadow-lg transition-all duration-300 flex items-center justify-center pulse-glow active:scale-90 ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'
+        className={`pointer-events-auto group relative bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-deep-blue p-4 rounded-2xl shadow-lg transition-all duration-300 flex items-center justify-center pulse-glow active:scale-90 ${isOpen ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'
           }`}
         style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
         aria-label="Open help chat"

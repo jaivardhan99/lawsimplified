@@ -111,9 +111,9 @@ const Docs = () => {
     setCart(prevCart => {
       const existingItem = prevCart.find(item => item._id === doc._id)
       if (existingItem) {
-        return prevCart.map(item => 
-          item._id === doc._id 
-            ? { ...item, quantity: item.quantity + 1 } 
+        return prevCart.map(item =>
+          item._id === doc._id
+            ? { ...item, quantity: item.quantity + 1 }
             : item
         )
       } else {
@@ -126,9 +126,9 @@ const Docs = () => {
     setCart(prevCart => {
       const existingItem = prevCart.find(item => item._id === docId)
       if (existingItem && existingItem.quantity > 1) {
-        return prevCart.map(item => 
-          item._id === docId 
-            ? { ...item, quantity: item.quantity - 1 } 
+        return prevCart.map(item =>
+          item._id === docId
+            ? { ...item, quantity: item.quantity - 1 }
             : item
         )
       } else {
@@ -164,19 +164,19 @@ const Docs = () => {
         </div>
 
         {/* Search and Filter */}
-        <div className="mb-12">
+        <div className="mb-12 relative z-10">
           <div className="flex flex-col md:flex-row gap-4 mb-8">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
               <input
                 type="text"
                 placeholder="Search documents..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition duration-300"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition duration-300 relative z-10"
               />
             </div>
-            
+
             {/* Cart Button */}
             <button
               onClick={() => setShowCart(!showCart)}
@@ -191,17 +191,16 @@ const Docs = () => {
               )}
             </button>
           </div>
-          
+
           <div className="flex flex-wrap gap-3 justify-center">
             {categories.map(category => (
               <button
                 key={category.name}
                 onClick={() => setSelectedCategory(category.name)}
-                className={`flex items-center gap-2 px-5 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
-                  selectedCategory === category.name
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
-                }`}
+                className={`flex items-center gap-2 px-5 py-3 rounded-full font-semibold transition-all duration-300 ${selectedCategory === category.name
+                  ? 'bg-blue-600 text-white shadow-lg scale-105'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
+                  }`}
               >
                 {category.icon}
                 {category.name}
@@ -213,14 +212,14 @@ const Docs = () => {
         {/* Cart Sidebar */}
         {showCart && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end" onClick={() => setShowCart(false)}>
-            <div 
+            <div
               className="bg-white w-full max-w-md h-full overflow-y-auto shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold text-blue-900">Your Cart</h2>
-                  <button 
+                  <button
                     onClick={() => setShowCart(false)}
                     className="text-gray-500 hover:text-gray-700"
                   >
@@ -239,8 +238,8 @@ const Docs = () => {
                       {cart.map(item => (
                         <div key={item._id} className="bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
                           <div className="flex gap-3 p-4">
-                            <img 
-                              src={item.image} 
+                            <img
+                              src={item.image}
                               alt={item.name}
                               className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                             />
@@ -258,14 +257,14 @@ const Docs = () => {
                               <div className="flex justify-between items-center">
                                 <span className="font-semibold text-blue-600">₹{item.price}</span>
                                 <div className="flex items-center gap-2">
-                                  <button 
+                                  <button
                                     onClick={() => removeFromCart(item._id)}
                                     className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1 rounded-full"
                                   >
                                     <Minus className="w-4 h-4" />
                                   </button>
                                   <span className="font-semibold w-8 text-center">{item.quantity}</span>
-                                  <button 
+                                  <button
                                     onClick={() => addToCart(item)}
                                     className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1 rounded-full"
                                   >
@@ -314,15 +313,15 @@ const Docs = () => {
             {filteredDocs.map((doc, index) => {
               const cartItem = cart.find(item => item._id === doc._id)
               return (
-                <div 
-                  key={doc._id} 
+                <div
+                  key={doc._id}
                   className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-l-4 border-blue-500"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   {/* Document Image */}
                   <div className="relative h-48 overflow-hidden bg-gray-100">
-                    <img 
-                      src={doc.image} 
+                    <img
+                      src={doc.image}
                       alt={doc.name}
                       className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                     />
@@ -331,24 +330,24 @@ const Docs = () => {
                       {doc.category}
                     </div>
                   </div>
-                  
+
                   <div className="p-6">
                     <h3 className="text-xl font-semibold text-blue-900 mb-3">{doc.name}</h3>
                     <p className="text-gray-600 mb-4 text-sm line-clamp-2">{doc.summary}</p>
-                    
+
                     {/* Price and Cart Controls */}
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-2xl font-bold text-blue-600">₹{doc.price}</span>
                       {cartItem ? (
                         <div className="flex items-center gap-2">
-                          <button 
+                          <button
                             onClick={() => removeFromCart(doc._id)}
                             className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1.5 rounded-full transition duration-200"
                           >
                             <Minus className="w-4 h-4" />
                           </button>
                           <span className="font-bold text-lg w-8 text-center">{cartItem.quantity}</span>
-                          <button 
+                          <button
                             onClick={() => addToCart(doc)}
                             className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-1.5 rounded-full transition duration-200"
                           >
@@ -356,7 +355,7 @@ const Docs = () => {
                           </button>
                         </div>
                       ) : (
-                        <button 
+                        <button
                           onClick={() => addToCart(doc)}
                           className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-1 transition duration-300"
                         >
@@ -365,18 +364,18 @@ const Docs = () => {
                         </button>
                       )}
                     </div>
-                    
+
                     <div className="flex gap-2">
                       <button
                         onClick={() => openEditor(doc.name)}
-                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition duration-300 text-center flex items-center justify-center gap-1 transform hover:scale-105"
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded-lg text-sm font-semibold transition duration-300 text-center flex items-center justify-center gap-1"
                       >
                         <span>Start Draft</span>
                         <ArrowRight className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => openManual(doc.name)}
-                        className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-blue-900 px-3 py-2 rounded-lg text-sm font-semibold transition duration-300 text-center flex items-center justify-center gap-1 transform hover:scale-105"
+                        className="flex-1 bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 text-blue-900 px-3 py-2 rounded-lg text-sm font-semibold transition duration-300 text-center flex items-center justify-center gap-1"
                       >
                         <FileText className="w-4 h-4" />
                         <span>Manual</span>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, FileText, HelpCircle, Shield, Users, BookOpen, ChevronRight, Sparkles } from 'lucide-react'
+import { ArrowRight, FileText, HelpCircle, Users, BookOpen, ChevronRight, Sparkles } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 
 // Intersection Observer hook for scroll-triggered animations
@@ -30,7 +30,7 @@ const Home = () => {
   const [featuresRef, featuresVisible] = useInView()
   const [templatesRef, templatesVisible] = useInView()
   const [howItWorksRef, howItWorksVisible] = useInView()
-  const [trustRef, trustVisible] = useInView()
+
 
   const features = [
     {
@@ -76,17 +76,12 @@ const Home = () => {
       {/* Hero Section */}
       <section ref={heroRef} className="relative bg-gradient-to-br from-deep-blue via-primary-900 to-deep-blue py-20 md:py-28 overflow-hidden">
         {/* Subtle background pattern */}
-        <div className="absolute inset-0 opacity-5" style={{
+        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
           backgroundImage: 'radial-gradient(circle at 25% 50%, rgba(0, 103, 255, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 50%, rgba(249, 224, 104, 0.2) 0%, transparent 50%)'
         }}></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className={`text-center transition-all duration-1000 ease-out ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="inline-flex items-center gap-2 bg-gold-500/10 border border-gold-500/20 rounded-full px-4 py-1.5 mb-6">
-              <Sparkles className="w-4 h-4 text-gold-400" />
-              <span className="text-sm text-gold-300 font-medium">AI-Powered Legal Platform</span>
-            </div>
-
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-soft-white mb-4 leading-tight">
               Law, <span className="gradient-text">Simplified.</span>
             </h1>
@@ -229,40 +224,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Trust Section */}
-      <section ref={trustRef} className="py-20 md:py-24 bg-deep-blue relative overflow-hidden">
-        {/* Background accent */}
-        <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage: 'radial-gradient(circle at 20% 80%, rgba(249, 224, 104, 0.4) 0%, transparent 40%), radial-gradient(circle at 80% 20%, rgba(0, 103, 255, 0.3) 0%, transparent 40%)'
-        }}></div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
-          <div className={`transition-all duration-700 ${trustVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <Shield className="w-14 h-14 text-gold-400 mb-6 mx-auto animate-float" />
-            <h2 className="text-3xl md:text-4xl font-bold text-soft-white mb-4">Trusted by Thousands of Indians</h2>
-            <p className="text-lg text-gray-300/80 max-w-2xl mx-auto mb-12">
-              Join our community of individuals and businesses who have simplified their legal processes with LexEase
-            </p>
-            <div className="flex flex-wrap justify-center gap-10 sm:gap-16">
-              {[
-                { value: '10K+', label: 'Documents Generated' },
-                { value: '5K+', label: 'Happy Users' },
-                { value: '25+', label: 'Legal Templates' },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  className={`text-center transition-all duration-700 ${trustVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-                    }`}
-                  style={{ transitionDelay: `${i * 200}ms` }}
-                >
-                  <div className="text-4xl md:text-5xl font-bold gradient-text mb-2">{stat.value}</div>
-                  <div className="text-gray-400 text-sm">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   )
 }

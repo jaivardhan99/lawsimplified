@@ -83,8 +83,8 @@ const Navbar = () => {
     <nav
       ref={menuRef}
       className={`sticky top-0 z-50 transition-all duration-500 ${scrolled
-          ? 'bg-deep-blue/98 backdrop-blur-xl shadow-lg shadow-black/20 border-b border-white/5'
-          : 'bg-deep-blue/95 backdrop-blur-md border-b border-white/10'
+        ? 'bg-deep-blue/98 backdrop-blur-xl shadow-lg shadow-black/20 border-b border-white/5'
+        : 'bg-deep-blue/95 backdrop-blur-md border-b border-white/10'
         }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -156,8 +156,8 @@ const Navbar = () => {
         <div
           id="mobile-nav"
           className={`md:hidden overflow-hidden transition-all duration-400 ease-out ${mobileMenuOpen
-              ? 'max-h-[500px] opacity-100 pb-4'
-              : 'max-h-0 opacity-0'
+            ? 'max-h-[500px] opacity-100 pb-4 pointer-events-auto'
+            : 'max-h-0 opacity-0 pointer-events-none'
             }`}
           style={{
             transitionProperty: 'max-height, opacity, padding',
@@ -171,8 +171,8 @@ const Navbar = () => {
                 key={path}
                 to={path}
                 className={`block px-3 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${isActivePath(path)
-                    ? 'text-gold-400 bg-gold-400/10'
-                    : 'text-soft-white hover:bg-white/5 hover:text-gold-300'
+                  ? 'text-gold-400 bg-gold-400/10'
+                  : 'text-soft-white hover:bg-white/5 hover:text-gold-300'
                   }`}
                 onClick={closeMobileMenu}
                 style={{
